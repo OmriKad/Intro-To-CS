@@ -4,6 +4,9 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #define VAT 1.17
+#define DELIVERY_PRICE 15.0
+#define BASE_LEN 40.0
+#define BASE_WID 40.0
 #define BASE_PRICE 60.0
 #define OLIVE_PRICE 10.0
 #define MUSH_PRICE 12.0
@@ -27,7 +30,7 @@ struct Pizza {
    the total sum and prints out the data. */
 void main()
 {
-    int id, delivery, num_of_pizzas, vat_total, payment, change, i;
+    int id, delivery_opt, num_of_pizzas, vat_total, payment, change, i;
     double total = 0.0;
 
     // Welcome page with customer ID request. 
@@ -39,7 +42,7 @@ void main()
     // Menu info print.
     printf("\nOur menu:\n");
     printf("*********\n");
-    printf("Basic pizza: %.2f NIS for 40x40 size pizza\n\n", BASE_PRICE);
+    printf("Basic pizza: %.2f NIS for %dx%d size pizza\n\n", BASE_PRICE, (int)BASE_LEN, (int)BASE_WID);
     printf("Toppings for basic size pizza:\n");
     printf("Olives: %d NIS\n", (int)OLIVE_PRICE);
     printf("Mushrooms: %d NIS\n\n", (int)MUSH_PRICE);
@@ -71,7 +74,7 @@ void main()
             if ((pizza.length - (int)pizza.length) != 0 || (pizza.length < 10) || (pizza.length > 40) || ((int)pizza.length % 2 != 0))
             {
                 printf("Invalid length! Basic length was chosen as a default.\n");
-                pizza.length = 40.0;
+                pizza.length = BASE_LEN;
             }
 
             printf("Please enter your pizza's width (cm): ");
@@ -79,9 +82,9 @@ void main()
             if ((pizza.width - (int)pizza.width) != 0 || (pizza.width < 10) || (pizza.width > 80) || ((int)pizza.width % 2 != 0))
             {
                 printf("Invalid width! Basic width was chosen as a default.\n");
-                pizza.width = 40.0;
+                pizza.width = BASE_WID;
             }
-            pizza.price += ((pizza.width * pizza.length) / 1600.0) * BASE_PRICE;
+            pizza.price += ((pizza.width * pizza.length) / (BASE_LEN * BASE_WID)) * BASE_PRICE;
 
             // The customer choosese dough type.
             printf("\nPlease enter the pizza's dough type:\nr - for regular\nv - for vegan\nw - for whole wheat\nf - for gluten-free\n");
@@ -114,7 +117,7 @@ void main()
                 pizza.doughType = REGULAR_DOUGH;
             }
             }
-            pizza.price += ((pizza.width * pizza.length) / 1600.0) * pizza.doughType;
+            pizza.price += ((pizza.width * pizza.length) / (BASE_LEN * BASE_WID)) * pizza.doughType;
 
             // Customer chooses optional toppings and the area they cover the pizza. Price is added accordingly to the selected area. 
             printf("\nPlease choose the toppings:\n");
@@ -151,7 +154,7 @@ void main()
                 pizza.olives = 0;
             }
             }
-            pizza.price += ((pizza.width * pizza.length * pizza.olives) / 1600.0) * OLIVE_PRICE;
+            pizza.price += ((pizza.width * pizza.length * pizza.olives) / (BASE_LEN * BASE_WID)) * OLIVE_PRICE;
 
             printf("\nMushrooms (choose 0-3):\n0. None\n1. Whole pizza\n2. Half pizza\n3. Quarter pizza\n");
             scanf(" %lf", &pizza.mushrooms);
@@ -207,7 +210,7 @@ void main()
                 pizza.mushrooms = 0;
             }
             }
-            pizza.price += ((pizza.width * pizza.length * pizza.mushrooms) / 1600.0) * MUSH_PRICE;
+            pizza.price += ((pizza.width * pizza.length * pizza.mushrooms) / (BASE_LEN * BASE_WID)) * MUSH_PRICE;
 
             // Pizza summery print and adding to total sum
             printf("\nPizza #%d details:\n*******************\n", i);
@@ -218,13 +221,13 @@ void main()
 
         printf("\n*************************************************\n");
         // Optional delivery.
-        printf("Do you want delivery for the price of 15 NIS? Enter 1 for delivery or 0 for pick-up: ");
-        scanf("%d", &delivery);
-        if (!(delivery == 1 || delivery == 0)) {
+        printf("Do you want delivery for the price of %d NIS? Enter 1 for delivery or 0 for pick-up: ", (int)DELIVERY_PRICE);
+        scanf("%d", &delivery_opt);
+        if (!(delivery_opt == 1 || delivery_opt == 0)) {
             printf("Invalid choice! Pick-up was chosen as a default.\n");
-            delivery = 0;
+            delivery_opt = 0;
         }
-        total += delivery * 15.0;
+        total += delivery_opt * DELIVERY_PRICE;
 
         // Total order info is printed for the customer.
         printf("\nYour order details:\n");
@@ -280,6 +283,11 @@ void main()
             printf("Your remaining balance is: %d\n", vat_total);
               
         }
+        
+        
+        
+        
+        
         
     }
 }
