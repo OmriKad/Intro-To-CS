@@ -34,7 +34,7 @@ typedef struct Pizza {
 }PIZZA;
 
 // An int id is entered, checks if the number length exceedes 9 digits.
-int idLen(id)
+int idLen(int id)
 {
     int counter = 0;
     for (counter; id != 0; counter ++)
@@ -47,7 +47,7 @@ int idLen(id)
 }
 
 // Checks if the check digit is correct by the protocol.
-int checkDigit(id)
+int checkDigit(int id)
 {
     int mult = 1, sum = 0, dig, checkDig;
     checkDig = id % 10;
@@ -85,7 +85,8 @@ int checkDigit(id)
     }
 }
 
-int GetIDNumber()
+// Asks the user for an id number, checks for validity with "idLen" & "checkDigit", if passed returns the number else prompts to try again.
+int getIdNumber()
 {
     int id;
     printf("Please enter your ID number:\n");
@@ -108,6 +109,7 @@ int GetIDNumber()
     return id;
 }
 
+// Menu info print.
 void printMenu()
 {
     printf("\nOur menu:\n");
@@ -140,50 +142,47 @@ int getNumOfPizzas()
     return num_of_pizzas;
 }
 
-/* This program is a pizza ordering service
-   that recives customer selections, calculates
-   the total sum and prints out the data. */
-void main()
-{
-    int id, delivery_opt, num_of_pizzas, vat_total, payment, change, i;
-    double total = 0.0;
+// The customer chooses pizza size and stored accordingly. The total basic price (toppings not included) is calculated and adds up.  
+PIZZA getPizzaDimensions()
+{   
+    PIZZA pizza;
+    pizza.price = 0;
+    pizza.toppings_sum = 0.0;
+    int flag1 = 0, flag2 = 0;
 
-    // Welcome page with customer ID request. 
-    printf(" Welcome to MTA-Pizza!\n\n");
-    printf("*****\n ***\n  *\n\n");
-    id = GetIDNumber();
-
-    // Menu info print.
-    printMenu();
-
-    // Iterations as the number of pizzas, For each one data is calculated.
-    num_of_pizzas = getNumOfPizzas();
-    for (i = 1; i <= num_of_pizzas; i++)
+    while(flag1 == 0)
     {
-        printf("\n*************************************************\nPizza #%d:\n\n", i);
-        PIZZA pizza;
-        pizza.price = 0;
-        pizza.toppings_sum = 0.0;
-
-        // The customer chooses pizza size and stored accordingly. The total basic price (toppings not included) is calculated and adds up.  
         printf("Please enter your pizza's length (cm): ");
         scanf("%f", &pizza.length);
         if ((pizza.length - (int)pizza.length) != 0 || (pizza.length < 10) || (pizza.length > 40) || ((int)pizza.length % 2 != 0))
         {
-            printf("Invalid length! Basic length was chosen as a default.\n");
-            pizza.length = BASE_LEN;
+            printf("Invalid length! Try again.\n");
         }
-
+        else
+            flag1 = 1;
+    }
+    
+    while(flag2 == 0)
+    {
         printf("Please enter your pizza's width (cm): ");
         scanf("%f", &pizza.width);
         if ((pizza.width - (int)pizza.width) != 0 || (pizza.width < 10) || (pizza.width > 80) || ((int)pizza.width % 2 != 0))
         {
-            printf("Invalid width! Basic width was chosen as a default.\n");
-            pizza.width = BASE_WID;
+            printf("Invalid width! Try again.\n");
         }
-        pizza.price += ((pizza.width * pizza.length) / (BASE_LEN * BASE_WID)) * BASE_PRICE;
+        else
+            flag2 = 1;    
+    }
+    pizza.price += ((pizza.width * pizza.length) / (BASE_LEN * BASE_WID)) * BASE_PRICE;
+    return pizza;
+}
 
-        // The customer choosese dough type.
+// The customer choosese dough type.
+PIZZA getDoughType(PIZZA pizza)
+{
+    int flag = 0;
+    while(flag == 0)
+    {
         printf("\nPlease enter the pizza's dough type:\nr - for regular\nv - for vegan\nw - for whole wheat\nf - for gluten-free\n");
         scanf(" %c", &pizza.doughType);
         switch (pizza.doughType)
@@ -191,123 +190,183 @@ void main()
         case 'r':
         {
             pizza.doughType = REGULAR_DOUGH;
+            flag = 1;
             break;
         }
         case 'v':
         {
             pizza.doughType = VEGAN_DOUGH;
+            flag = 1;
             break;
         }
         case 'w':
         {
             pizza.doughType = WW_DOUGH;
+            flag = 1;
             break;
         }
         case 'f':
         {
             pizza.doughType = GF_DOUGH;
+            flag = 1;
             break;
         }
         default:
         {
-            printf("Invalid choice! Regular dough was chosen as a default.\n");
-            pizza.doughType = REGULAR_DOUGH;
+            printf("Invalid choice! Try again.\n");
         }
         }
-        pizza.price += ((pizza.width * pizza.length) / (BASE_LEN * BASE_WID)) * pizza.doughType;
+    }
+    pizza.price += ((pizza.width * pizza.length) / (BASE_LEN * BASE_WID)) * pizza.doughType;
+    return pizza;
+}
 
-        // Customer chooses optional toppings and the area they cover the pizza. Price is added accordingly to the selected area. 
-        printf("\nPlease choose the toppings:\n");
-        printf("\nOlives (choose 0-3):\n0. None\n1. Whole pizza\n2. Half pizza\n3. Quarter pizza\n");
-        scanf(" %lf", &pizza.olives);
-        switch ((int)pizza.olives) 
-        {
-        case 0:
-        {
-            pizza.olives = 0;
-            break;
-        }
-        case 1:
-        {
-            pizza.olives = 1;
-            pizza.toppings_sum += 1.0;
-            break;
-        }
-        case 2:
-        {
-            pizza.olives = 0.5;
-            pizza.toppings_sum += 0.5;
-            break;
-        }
-        case 3:
-        {
-            pizza.olives = 0.25;
-            pizza.toppings_sum += 0.25;
-            break;
-        }
-        default:
-        {
-            printf("Invalid choice! Current topping not added.\n");
-            pizza.olives = 0;
-        }
-        }
-        pizza.price += ((pizza.width * pizza.length * pizza.olives) / (BASE_LEN * BASE_WID)) * OLIVE_PRICE;
 
-        printf("\nMushrooms (choose 0-3):\n0. None\n1. Whole pizza\n2. Half pizza\n3. Quarter pizza\n");
-        scanf(" %lf", &pizza.mushrooms);
-        switch ((int)pizza.mushrooms) 
+void toppingSelect(double *pizzaTopPtr, double *pizzaSumPtr, double *pizzaPricePtr, double length, double width, int topping)
+{
+    int flag = 0, choise;
+    while(flag == 0)
+    {
+        switch (topping)
         {
-        case 0:
-        {
-            pizza.mushrooms = 0;
-            break;
-        }
-        case 1:
-        {
-            if (pizza.toppings_sum + 1.0 > 1.0) {
-                printf("You have exceeded the maximum amount of toppings allowed on one pizza! Current topping not added.\n");
-                pizza.mushrooms = 0;
+            case 1:
+            {
+                printf("\nOlives (choose 0-3):\n0. None\n1. Whole pizza\n2. Half pizza\n3. Quarter pizza\n");
                 break;
             }
-            else {
-                pizza.mushrooms = 1;
-                pizza.toppings_sum += 1;
+            case 2:
+            {
+                printf("\nMushrooms (choose 0-3):\n0. None\n1. Whole pizza\n2. Half pizza\n3. Quarter pizza\n");
                 break;
             }
-        }
-        case 2:
-        {
-            if (pizza.toppings_sum + 0.5 > 1.0) {
-                printf("You have exceeded the maximum amount of toppings allowed on one pizza! Current topping not added.\n");
-                pizza.mushrooms = 0;
+            case 3:
+            {
+                printf("\nTomatos (choose 0-3):\n0. None\n1. Whole pizza\n2. Half pizza\n3. Quarter pizza\n");
                 break;
             }
-            else {
-                pizza.mushrooms = 0.5;
-                pizza.toppings_sum += 0.5;
+            case 4:
+            {
+                printf("\nPineapple (choose 0-3):\n0. None\n1. Whole pizza\n2. Half pizza\n3. Quarter pizza\n");
                 break;
             }
         }
-        case 3:
+        scanf("%d", &choise);
+        switch (choise) 
         {
-            if (pizza.toppings_sum + 0.25 > 1.0) {
-                printf("You have exceeded the maximum amount of toppings allowed on one pizza! Current topping not added.\n");
-                pizza.mushrooms = 0;
+            case 0:
+            {
+                *pizzaTopPtr = 0;
+                flag = 1;
                 break;
             }
-            else {
-                pizza.mushrooms = 0.25;
-                pizza.toppings_sum += 0.25;
-                break;
+            case 1:
+            {
+                if (*pizzaSumPtr + 1.0 > 1.0)
+                {
+                    printf("You have exceeded the maximum amount of toppings allowed on one pizza! Try again.\n");
+                    break;
+                }
+                else
+                {
+                    *pizzaTopPtr = 1;
+                    *pizzaSumPtr += 1;
+                    flag = 1;
+                    break;
+                }
             }
+            case 2:
+            {
+                if (*pizzaSumPtr + 0.5 > 1.0)
+                {
+                    printf("You have exceeded the maximum amount of toppings allowed on one pizza! Try again.\n");
+                    break;
+                }
+                else
+                {
+                    *pizzaTopPtr = 0.5;
+                    *pizzaSumPtr += 0.5;
+                    flag = 1;
+                    break;
+                }
+            }
+            case 3:
+            {
+                if (*pizzaSumPtr + 0.25 > 1.0)
+                {
+                    printf("You have exceeded the maximum amount of toppings allowed on one pizza! Try again.\n");
+                    break;
+                }
+                else 
+                {
+                    *pizzaTopPtr = 0.25;
+                    *pizzaSumPtr += 0.25;
+                    flag = 1;
+                    break;
+                }
+            }
+            default:
+                printf("Invalid choice! Try again.\n");
         }
-        default:
-        {
-            printf("Invalid choice! Current topping not added.\n");
-            pizza.mushrooms = 0;
-        }
-        }
-        pizza.price += ((pizza.width * pizza.length * pizza.mushrooms) / (BASE_LEN * BASE_WID)) * MUSH_PRICE;
+    }
+
+    if (topping == 1)
+        *pizzaPricePtr += ((width * length * (*pizzaTopPtr)) / (BASE_LEN * BASE_WID)) * OLIVE_PRICE;
+    else if (topping == 2)
+        *pizzaPricePtr += ((width * length * (*pizzaTopPtr)) / (BASE_LEN * BASE_WID)) * MUSH_PRICE;
+    else if (topping == 3) 
+        *pizzaPricePtr += ((width * length * (*pizzaTopPtr)) / (BASE_LEN * BASE_WID)) * TOMATO_PRICE;
+    else if (topping == 4)
+        *pizzaPricePtr += ((width * length * (*pizzaTopPtr)) / (BASE_LEN * BASE_WID)) * PINAP_PRICE;
+    return;
+}
+
+// Customer chooses optional toppings and the area they cover the pizza. Price is added accordingly to the selected area. 
+PIZZA getToppings(PIZZA pizza)
+{
+    printf("\nPlease choose the toppings:\n");
+    toppingSelect(&pizza.olives, &pizza.toppings_sum, &pizza.price, pizza.length, pizza.width, 1);
+    if (pizza.toppings_sum == 1)
+        return pizza;
+    toppingSelect(&pizza.mushrooms, &pizza.toppings_sum, &pizza.price, pizza.length, pizza.width, 2);
+    if (pizza.toppings_sum == 1)
+        return pizza;
+    toppingSelect(&pizza.tomatoes, &pizza.toppings_sum, &pizza.price, pizza.length, pizza.width, 3);
+    if (pizza.toppings_sum == 1)
+        return pizza;
+    toppingSelect(&pizza.pineapple, &pizza.toppings_sum, &pizza.price, pizza.length, pizza.width, 4);
+    if (pizza.toppings_sum == 1)
+        return pizza;
+    
+}
+
+/* This program is a pizza ordering service
+   that recives customer selections, calculates
+   the total sum and prints out the data. */
+void main()
+{
+    int id, delivery_opt, num_of_pizzas, vat_total, payment, change, i;
+    double total = 0.0;
+    PIZZA pizza;
+
+    // Welcome page with logo. 
+    printf(" Welcome to MTA-Pizza!\n\n");
+    printf("*****\n ***\n  *\n\n");
+    
+    // Id request.
+    id = getIdNumber();
+
+    //Menu print.
+    printMenu();
+
+    // Iterations as the number of pizzas, For each one data is calculated.
+    num_of_pizzas = getNumOfPizzas();
+    for (i = 1; i <= num_of_pizzas; i++)
+    {
+        printf("\n*************************************************\nPizza #%d:\n\n", i);
+        pizza = getPizzaDimensions();
+        pizza = getDoughType(pizza);
+        pizza = getToppings(pizza);
+        
 
         // Pizza summery print and adding to total sum
         printf("\nPizza #%d details:\n*******************\n", i);
