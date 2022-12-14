@@ -41,7 +41,7 @@ int idLen(int id)
         {
             id /= 10;
         }
-    if (counter > 9)
+    if (counter > 9 || counter == 0)
         return 0;
     return 1;
 }
@@ -50,9 +50,9 @@ int idLen(int id)
 int checkDigit(int id)
 {
     int mult = 1, sum = 0, dig, checkDig;
-    checkDig = id % 10;
+    checkDig = id % 10; // Far right digit of id num.
     id /= 10;
-    while (id)
+    while (id) // Every iteration the far right digit is being multiplied with alternating 1 or 2 and added to a sum.  
     {
         dig = id % 10;
         if (mult == 1)
@@ -75,7 +75,7 @@ int checkDigit(int id)
         }
         id /= 10;
     }
-    if ((sum + checkDig) % 10 == 0)
+    if ((sum + checkDig) % 10 == 0) // The rule for correct check digit. If correct 1 is returned, else 0.
     {
         return 1;
     }
@@ -95,13 +95,13 @@ int getIdNumber()
     {
         if (idLen(id) == 0)
         {
-            printf("Invalid ID number! try again.\n");
+            printf("Invalid ID number! Try again.\n");
             printf("Please enter your ID number:\n");
             scanf("%d", &id);
         }
         else if (checkDigit(id) == 0)
         {
-            printf("Invalid check digit! try again.\n");
+            printf("Invalid check digit! Try again.\n");
             printf("Please enter your ID number:\n");
             scanf("%d", &id);
         }
@@ -119,7 +119,7 @@ void printMenu()
     printf("Olives: %d NIS\n", (int)OLIVE_PRICE);
     printf("Mushrooms: %d NIS\n", (int)MUSH_PRICE);
     printf("Tomatoes: %d NIS\n", (int)TOMATO_PRICE);
-    printf("Pinapple: %d NIS\n\n", (int)PINAP_PRICE);
+    printf("Pineapple: %d NIS\n\n", (int)PINAP_PRICE);
     printf("Dough type for basic size pizza:\n");
     printf("Regular: %d NIS\n", (int)REGULAR_DOUGH);
     printf("Vegan: %d NIS\n", (int)VEGAN_DOUGH);
@@ -127,7 +127,7 @@ void printMenu()
     printf("Gluten free: %d NIS\n\n", (int)GF_DOUGH);
 }
 
-// Customer enters the number of pizzas for order. If a non positive number is entered the user is prompted to try again.
+//  Choose the number of pizzas for order as an int. If a non positive number is entered the user is prompted to try again.
 int getNumOfPizzas()
 {
     int num_of_pizzas;
@@ -142,45 +142,47 @@ int getNumOfPizzas()
     return num_of_pizzas;
 }
 
-// The customer chooses pizza size and stored accordingly. The total basic price (toppings not included) is calculated and adds up.  
+// Choose pizza sizes and store accordingly. The total basic price (toppings not included) is calculated and adds up.  
 PIZZA getPizzaDimensions()
 {   
-    PIZZA pizza;
+    PIZZA pizza; // Pizza initializtion.
+    pizza.q1 = ' ', pizza.q2 = ' ', pizza.q3 = ' ', pizza.q4 = ' '; // Q's fields are set to ' ' as a default.
     pizza.price = 0;
     pizza.toppings_sum = 0.0;
-    int flag1 = 0, flag2 = 0;
+    int flag = 0; // Flag to mark valid exit of while loops.
 
-    while(flag1 == 0)
+    while(flag == 0)
     {
         printf("Please enter your pizza's length (cm): ");
         scanf("%f", &pizza.length);
-        if ((pizza.length - (int)pizza.length) != 0 || (pizza.length < 10) || (pizza.length > 40) || ((int)pizza.length % 2 != 0))
+        if ((pizza.length - (int)pizza.length) != 0 || (pizza.length < 10) || (pizza.length > 40) || ((int)pizza.length % 2 != 0)) // Valid pizza length is an even int that is 10-40 (inclusice).
         {
             printf("Invalid length! Try again.\n");
         }
         else
-            flag1 = 1;
+            flag = 1;
     }
-    
-    while(flag2 == 0)
+    flag = 0;
+    while(flag == 0)
     {
         printf("Please enter your pizza's width (cm): ");
         scanf("%f", &pizza.width);
-        if ((pizza.width - (int)pizza.width) != 0 || (pizza.width < 10) || (pizza.width > 80) || ((int)pizza.width % 2 != 0))
+        if ((pizza.width - (int)pizza.width) != 0 || (pizza.width < 10) || (pizza.width > 80) || ((int)pizza.width % 2 != 0)) // Valid pizza width is an even int that is 10-80 (inclusice).
         {
             printf("Invalid width! Try again.\n");
         }
         else
-            flag2 = 1;    
+            flag = 1;    
     }
-    pizza.price += ((pizza.width * pizza.length) / (BASE_LEN * BASE_WID)) * BASE_PRICE;
+    pizza.price += ((pizza.width * pizza.length) / (BASE_LEN * BASE_WID)) * BASE_PRICE; // Price is being calculated as the ratio of selected sizes and basic sizes, times the basic price.
     return pizza;
 }
 
-// The customer choosese dough type.
+// Choose dough type.
 PIZZA getDoughType(PIZZA pizza)
 {
-    int flag = 0;
+    int flag = 0; // Flag to mark valid exit of while loops.
+    double doughPrice;
     while(flag == 0)
     {
         printf("\nPlease enter the pizza's dough type:\nr - for regular\nv - for vegan\nw - for whole wheat\nf - for gluten-free\n");
@@ -189,25 +191,25 @@ PIZZA getDoughType(PIZZA pizza)
         {
         case 'r':
         {
-            pizza.doughType = REGULAR_DOUGH;
+            doughPrice = REGULAR_DOUGH;
             flag = 1;
             break;
         }
         case 'v':
         {
-            pizza.doughType = VEGAN_DOUGH;
+            doughPrice = VEGAN_DOUGH;
             flag = 1;
             break;
         }
         case 'w':
         {
-            pizza.doughType = WW_DOUGH;
+            doughPrice = WW_DOUGH;
             flag = 1;
             break;
         }
         case 'f':
         {
-            pizza.doughType = GF_DOUGH;
+            doughPrice = GF_DOUGH;
             flag = 1;
             break;
         }
@@ -217,41 +219,42 @@ PIZZA getDoughType(PIZZA pizza)
         }
         }
     }
-    pizza.price += ((pizza.width * pizza.length) / (BASE_LEN * BASE_WID)) * pizza.doughType;
+    pizza.price += ((pizza.width * pizza.length) / (BASE_LEN * BASE_WID)) * doughPrice;
     return pizza;
 }
 
-
+// Part of the topping selection phase - responsible for the pizza fraction control as the toppings cannot exceed 1. If an error occures the user promted to try again.
 void toppingSelect(double *pizzaTopPtr, double *pizzaSumPtr, double *pizzaPricePtr, double length, double width, int topping)
 {
     int flag = 0, choise;
-    while(flag == 0)
+    switch (topping) // Topping is recieved by previous function as an int (there are only 4 toppings available)
     {
-        switch (topping)
+        case 1:
         {
-            case 1:
-            {
-                printf("\nOlives (choose 0-3):\n0. None\n1. Whole pizza\n2. Half pizza\n3. Quarter pizza\n");
-                break;
-            }
-            case 2:
-            {
-                printf("\nMushrooms (choose 0-3):\n0. None\n1. Whole pizza\n2. Half pizza\n3. Quarter pizza\n");
-                break;
-            }
-            case 3:
-            {
-                printf("\nTomatos (choose 0-3):\n0. None\n1. Whole pizza\n2. Half pizza\n3. Quarter pizza\n");
-                break;
-            }
-            case 4:
-            {
-                printf("\nPineapple (choose 0-3):\n0. None\n1. Whole pizza\n2. Half pizza\n3. Quarter pizza\n");
-                break;
-            }
+            printf("\nOlives (choose 0-3):\n");
+            break;
         }
+        case 2:
+        {
+            printf("\nMushrooms (choose 0-3):\n");
+            break;
+        }
+        case 3:
+        {
+            printf("\nTomatos (choose 0-3):\n");
+            break;
+        }
+        case 4:
+        {
+            printf("\nPineapple (choose 0-3):\n");
+            break;
+        }
+    }
+    while(flag == 0) // Guards for faulty inputs, prompts to try again.
+    {
+        printf("0. None\n1. Whole pizza\n2. Half pizza\n3. Quarter pizza\n");
         scanf("%d", &choise);
-        switch (choise) 
+        switch (choise) // Switches based on user input, if false breaks and the guard bounces it back to here. If true the value is written using the pointer of the topping recieved.
         {
             case 0:
             {
@@ -308,7 +311,7 @@ void toppingSelect(double *pizzaTopPtr, double *pizzaSumPtr, double *pizzaPriceP
                 printf("Invalid choice! Try again.\n");
         }
     }
-
+    // If all went well, Finally calculates the price and adds to the price pointer of the given pizza.
     if (topping == 1)
         *pizzaPricePtr += ((width * length * (*pizzaTopPtr)) / (BASE_LEN * BASE_WID)) * OLIVE_PRICE;
     else if (topping == 2)
@@ -324,6 +327,7 @@ void toppingSelect(double *pizzaTopPtr, double *pizzaSumPtr, double *pizzaPriceP
 PIZZA getToppings(PIZZA pizza)
 {
     printf("\nPlease choose the toppings:\n");
+    // The topping select function is the drive function for the logic regard toppings, it is called 4 times in this order with different arguments.
     toppingSelect(&pizza.olives, &pizza.toppings_sum, &pizza.price, pizza.length, pizza.width, 1);
     if (pizza.toppings_sum == 1)
         return pizza;
@@ -336,7 +340,177 @@ PIZZA getToppings(PIZZA pizza)
     toppingSelect(&pizza.pineapple, &pizza.toppings_sum, &pizza.price, pizza.length, pizza.width, 4);
     if (pizza.toppings_sum == 1)
         return pizza;
-    
+    return pizza;
+}
+
+// Part of the printPizzaDetails function. Responsible for naming each quarter with the correct charecter of the pizza topping. All char selection follows a number hierarchy based on vacancy (quarter 1 goes first, then 2 and so on). 
+void quarterSelect(double *pizzaToppingPtr, char *pizzaQ1Ptr, char *pizzaQ2Ptr, char *pizzaQ3Ptr, char *pizzaQ4Ptr, char topping)
+{
+    if (*pizzaQ1Ptr == ' ') // If quarter 1 is empty, we have 3 options to fill the pizza with the given topping (based on topping fraction value given).
+    {
+        if (*pizzaToppingPtr == 0.25)
+        {
+            *pizzaQ1Ptr = topping;
+            return;
+        }
+        else if (*pizzaToppingPtr == 0.5)
+        {
+            *pizzaQ1Ptr = topping, *pizzaQ2Ptr = topping;
+            return;
+        }
+        else if (*pizzaToppingPtr == 1)
+        {
+            *pizzaQ1Ptr = topping, *pizzaQ2Ptr = topping, *pizzaQ3Ptr = topping, *pizzaQ4Ptr = topping;
+            return;
+        }
+    }
+    else if (*pizzaQ2Ptr == ' ') // If quarter 2 is empty, we have 2 options to fill the pizza with the given topping (based on topping fraction value given).
+    {
+        if (*pizzaToppingPtr == 0.25)
+        {
+            *pizzaQ2Ptr = topping;
+            return;
+        }
+        else if (*pizzaToppingPtr == 0.5) 
+        {
+            *pizzaQ2Ptr = topping, *pizzaQ3Ptr = topping;
+            return;
+        }
+    }
+    else if (*pizzaQ3Ptr == ' ') // If quarter 3 is empty, we have 2 options to fill the pizza with the given topping (based on topping fraction value given).
+    {
+        if (*pizzaToppingPtr == 0.25)
+        {
+            *pizzaQ3Ptr = topping;
+            return;
+        }
+        else if (*pizzaToppingPtr == 0.5)
+        {
+            *pizzaQ3Ptr = topping, *pizzaQ4Ptr = topping;
+            return;
+        }
+    }
+    else if (*pizzaQ4Ptr == ' ') // If quarter 4 is empty, we have 1 option to fill the pizza with the given topping (based on topping fraction value given).
+    {
+        if (*pizzaToppingPtr == 0.25)
+        {
+            *pizzaQ4Ptr = topping;
+            return;
+        }
+    }
+}
+
+// Part of the printPizzaDetails function. Prints the pizza according to the size, dough type and toppings. All stored in the current pizza struct.
+void printPizza(PIZZA pizza)
+{
+    int i, j; // i - rows , j - columns.
+    for (j = 0; j < pizza.width; j++)
+        printf("%c", pizza.doughType); // Top crust.
+    printf("\n");
+    for (i = 0; i < (pizza.length - 2) / 2; i++) // First half of the pizza by rows.
+    {
+        printf("%c", pizza.doughType);
+        for (j = 0; j < (pizza.width - 2) / 2 ; j++)
+            printf("%c", pizza.q4);
+        for (j = 0; j < (pizza.width - 2) / 2 ; j++)
+            printf("%c", pizza.q1);
+        printf("%c", pizza.doughType);
+        printf("\n");
+    }
+    for (i = 0; i < (pizza.length - 2) / 2; i++) // Second half of the pizza by rows.
+    {
+        printf("%c", pizza.doughType);
+        for (j = 0; j < (pizza.width - 2) / 2 ; j++)
+            printf("%c", pizza.q3);
+        for (j = 0; j < (pizza.width - 2) / 2 ; j++)
+            printf("%c", pizza.q2);
+        printf("%c", pizza.doughType);
+        printf("\n");
+    }
+    for (j = 0; j < pizza.width; j++)
+        printf("%c", pizza.doughType); // Lower crust.
+    printf("\n");
+}
+
+void printPizzaDetails(PIZZA pizza, int i)
+{
+    quarterSelect(&pizza.olives, &pizza.q1, &pizza.q2, &pizza.q3, &pizza.q4, 'O');
+    quarterSelect(&pizza.mushrooms, &pizza.q1, &pizza.q2, &pizza.q3, &pizza.q4, 'M');
+    quarterSelect(&pizza.tomatoes, &pizza.q1, &pizza.q2, &pizza.q3, &pizza.q4, 'T');
+    quarterSelect(&pizza.pineapple, &pizza.q1, &pizza.q2, &pizza.q3, &pizza.q4, 'P');
+    // Pizza summery print and adding to total sum
+    printf("\nPizza #%d details:\n*******************\n", i);
+    printf("Pizza size: %dx%d\n", (int)pizza.length, (int)pizza.width);
+    printf("Pizza price (without tax): %.2lf\n", pizza.price);
+    printPizza(pizza);
+}
+ // Optional delivery.
+int getDelivery()
+{
+    int delivery_opt, flag = 0;
+    printf("Do you want delivery for the price of %d NIS? Enter 1 for delivery or 0 for pick-up: ", (int)DELIVERY_PRICE);
+    scanf("%d", &delivery_opt);
+    while (flag == 0)
+    {
+        if (!(delivery_opt == 1 || delivery_opt == 0))
+        {
+            printf("Invalid choice! Try again.\n");
+            printf("Do you want delivery for the price of %d NIS? Enter 1 for delivery or 0 for pick-up: ", (int)DELIVERY_PRICE);
+            scanf("%d", &delivery_opt);
+        }
+        else
+            flag = 1;
+    }
+    return delivery_opt * DELIVERY_PRICE;
+}
+
+// Payment system.
+void getPayment(int totalPrice)
+{
+    int change, payment;
+    while (totalPrice > 0)
+        {
+            printf("Please enter your payment: ");
+            scanf("%d", &payment);
+            totalPrice -= payment;
+            if (totalPrice < 0) 
+            {
+                change = (-1) * (totalPrice);
+                printf("Your change is %d NIS using: \n", change);
+                if ((change / 10) > 0)
+                {
+                    printf("%d coin(s) of ten\n", (change / 10));
+                    change %= 10;
+                }
+                if ((change / 5) > 0) 
+                {
+                    printf("%d coin(s) of five\n", (change / 5));
+                    change %= 5;
+                }
+                if ((change / 2) > 0) 
+                {
+                    printf("%d coin(s) of two\n", (change / 2));
+                    change %= 2;
+                }
+                if (change > 0) 
+                {
+                    printf("%d coin(s) of one\n", change);
+                    printf("Thank you for your order!");
+                    break;
+                }
+                if (change == 0) 
+                {
+                    printf("Thank you for your order!");
+                    break;
+                }
+            }
+            else if (totalPrice == 0)
+            {
+                printf("Thank you for your order!");
+                break;
+            }
+            printf("Your remaining balance is: %d\n", totalPrice);
+        }
 }
 
 /* This program is a pizza ordering service
@@ -344,8 +518,8 @@ PIZZA getToppings(PIZZA pizza)
    the total sum and prints out the data. */
 void main()
 {
-    int id, delivery_opt, num_of_pizzas, vat_total, payment, change, i;
-    double total = 0.0;
+    int id, num_of_pizzas, i, delivery_price, vat_total;
+    double totalPrice = 0.0;
     PIZZA pizza;
 
     // Welcome page with logo. 
@@ -366,24 +540,13 @@ void main()
         pizza = getPizzaDimensions();
         pizza = getDoughType(pizza);
         pizza = getToppings(pizza);
-        
-
-        // Pizza summery print and adding to total sum
-        printf("\nPizza #%d details:\n*******************\n", i);
-        printf("Pizza size: %dx%d\n", (int)pizza.length, (int)pizza.width);
-        printf("Pizza price (without tax): %.2lf\n", pizza.price);
-        total += pizza.price;
+        printPizzaDetails(pizza, i);
+        totalPrice += pizza.price;
     }
 
     printf("\n*************************************************\n");
-    // Optional delivery.
-    printf("Do you want delivery for the price of %d NIS? Enter 1 for delivery or 0 for pick-up: ", (int)DELIVERY_PRICE);
-    scanf("%d", &delivery_opt);
-    if (!(delivery_opt == 1 || delivery_opt == 0)) {
-        printf("Invalid choice! Pick-up was chosen as a default.\n");
-        delivery_opt = 0;
-    }
-    total += delivery_opt * DELIVERY_PRICE;
+
+    delivery_price = getDelivery();
 
     // Total order info is printed for the customer.
     printf("\nYour order details:\n");
@@ -393,51 +556,20 @@ void main()
     printf("ID number: %09d\n", id);
     printf("Number of pizzas: %d\n", i-1);
 
+    if (delivery_price != 0)
+    {
+        totalPrice += delivery_price;
+        printf("Delivery\n");
+    }
+    else
+        printf("Pick-up\n");
+
     // Total price is formated to show 2 digits after decimal point precision.
-    printf("Total price: %.2f\n", total);
+    printf("Total price: %.2f\n", totalPrice);
 
     // The VAT is added to the float and then the expression is casted into an integer to round down the price.
-    vat_total = (int)(total * VAT);
+    vat_total = (int)(totalPrice * VAT);
     printf("Total price with tax (rounded down): %d\n\n", vat_total);
-    
-    // Payment system.
-    while (vat_total > 0) {
-        printf("Please enter your payment: ");
-        scanf("%d", &payment);
-        vat_total -= payment;
-        if (vat_total < 0) {
-            change = (-1) * (vat_total);
-            printf("Your change is %d NIS using: \n", change);
-            if ((change / 10) > 0) {
-                printf("%d coin(s) of ten\n", (change / 10));
-                change %= 10;
-            }
-            if ((change / 5) > 0) {
-                printf("%d coin(s) of five\n", (change / 5));
-                change %= 5;
-            }
-            if ((change / 2) > 0) {
-                printf("%d coin(s) of two\n", (change / 2));
-                change %= 2;
-            }
-            if (change > 0) {
-                printf("%d coin(s) of one\n", change);
-                printf("Thank you for your order!");
-                break;
-            }
-            if (change == 0) {
-                printf("Thank you for your order!");
-                break;
-            }
-            
-        }
-        else if (vat_total == 0) {
-            printf("Thank you for your order!");
-            break;
-        }
 
-        printf("Your remaining balance is: %d\n", vat_total);
-            
-    }
-
+    getPayment(vat_total);
 }
